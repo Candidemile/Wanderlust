@@ -98,7 +98,6 @@ const renderVenues = (venues) => {
 
 		//const venuePhotoContent = `<img src="${venuePhotoUrl}"/>`;
 		console.log('url is ',venuePhotoUrl);
-		//$venuePhotoDivs[index].append(venuePhotoContent);
   });
   $destination.append(`<h2>${venues[0].location.city}</h2>`);
 }
@@ -122,7 +121,6 @@ const renderForecast = (days) => {
 
 const executeSearch = () => {
   $venueDivs.forEach(venue => venue.empty());
-	$venuePhotoDivs.forEach(venue => venue.empty());
   $weatherDivs.forEach(day => day.empty());
   $destination.empty();
   $container.css("visibility", "visible");
