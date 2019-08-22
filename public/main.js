@@ -23,12 +23,9 @@ const getVenues = async () => {
   try {
     const response = await fetch(urlToFetch);
     if (response.ok) {
-      //console.log(response);
       const jsonResponse = await response.json();
-      //console.log(jsonResponse);
       let venues = jsonResponse.response.groups[0].items;
       venues = venues.map(venue => venue.venue);
-      console.log(venues);
       return venues
     }
   } catch(error) {
@@ -39,15 +36,32 @@ const getVenues = async () => {
 const getForecast = async () => {
   const city = $input.val();
   const urlToFetch = `${forecastUrl}${apiKey}&q=${city}&days=4&hour=11`;
-  console.log(urlToFetch);
 	try {
     const response = await fetch(urlToFetch);
     if (response.ok) {
       const jsonResponse = await response.json();
-      //console.log(jsonResponse);
       let days = jsonResponse.forecast.forecastday;
-      //console.log(days[0]);
+      console.log(days[0]);
       return days;
+    }
+  } catch(error) {
+    console.log(error);
+  }
+}
+
+//this function gets a photo response for a specific venue by id and returns url to that phoro imgage
+const getVenuePhoto = async (venue) => {
+	const id = venue.id;
+	const urlToFetch = `https://api.foursquare.com/v2/venues/${id}/photos?limin=4&client_id=${clientId}&client_secret=${clientSecret}&v=20190820`;
+	//console.log(urlToFetch);
+	try {
+    const response = await fetch(urlToFetch);
+    if (response.ok) {
+      const jsonResponse = await response.json();
+      let venuePhoto = jsonResponse.response.photos.items[0];
+			const venuePhotoUrl = `${venuePhoto.prefix}100x100${venuePhoto.suffix}`
+      console.log(venuePhotoUrl);
+      return venuePhotoUrl
     }
   } catch(error) {
     console.log(error);
@@ -57,19 +71,34 @@ const getForecast = async () => {
 
 // Render functions
 const renderVenues = (venues) => {
-  $venueDivs.forEach(($venue, index) => {
+	const randomArray = getRandomArrayElem(venues);
+	//console.log(randomArray);
+  $venueDivs.forEach(async ($venue, index) => {
     // Add your code here:
-		const venue = venues[index];
+		//const venue = venues[index];
+		let venue = randomArray[index];
+		//console.log(venues);
+		//console.log(venue.name);
 		venueIcon = venue.categories[0].icon;
     venueImgSrc = venueIcon.prefix + 'bg_64' + venueIcon.suffix;
+		let postalCode = '';
+		if (venue.location.postalCode) {
+			postalCode = venue.location.postalCode;
+		}
+		const venuePhotoUrl = await getVenuePhoto(venue); //get photo
     let venueContent = `<h2>${venue.name}</h2>
 		<img class="venueimage" src="${venueImgSrc}"/>
 		<h3>Address:</h3>
 		<p>${venue.location.address}</p>
 		<p>${venue.location.city}</p>
-		<p>${venue.location.country}</p>`;
-    console.log(venue.address, venue.city);
+		<p>${venue.location.country}</p>
+		<p>${postalCode}</p>
+		<img class="venuePhoto" src="${venuePhotoUrl}"/>`;
     $venue.append(venueContent);
+
+		//const venuePhotoContent = `<img src="${venuePhotoUrl}"/>`;
+		console.log('url is ',venuePhotoUrl);
+		//$venuePhotoDivs[index].append(venuePhotoContent);
   });
   $destination.append(`<h2>${venues[0].location.city}</h2>`);
 }
@@ -78,11 +107,13 @@ const renderForecast = (days) => {
   $weatherDivs.forEach(($day, index) => {
     // Add your code here:
 		const currentDay = days[index];
-    console.log('days: ',days);
     const weekDay = new Date(currentDay.date).getDay();
     const day = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][weekDay];
-    let weatherContent = `<h2> High: ${currentDay.day.maxtemp_c}</h2>
-		<h2> Low: ${currentDay.day.mintemp_c}</h2>
+		const uv = uvExplained(currentDay.day.uv);
+    let weatherContent = `<h2> High: ${currentDay.day.maxtemp_c}&#8451</h2>
+		<h2> Low: ${currentDay.day.mintemp_c}&#8451</h2>
+		<p> Maximum Wind Speed is ${currentDay.day.maxwind_kph} km per hour </p>
+		<p> UV radiation - ${uv}</p>
 		<img src="http:${currentDay.day.condition.icon}" class="weathericon" />
 		<h2>${day}</h2>`;
     $day.append(weatherContent);
@@ -91,6 +122,7 @@ const renderForecast = (days) => {
 
 const executeSearch = () => {
   $venueDivs.forEach(venue => venue.empty());
+	$venuePhotoDivs.forEach(venue => venue.empty());
   $weatherDivs.forEach(day => day.empty());
   $destination.empty();
   $container.css("visibility", "visible");

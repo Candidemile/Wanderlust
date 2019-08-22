@@ -74,6 +74,7 @@ footer {
   height: 260px;
   padding: 20px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+  background-color: LightSkyBlue;
 }
 
 .weathericon {
@@ -83,19 +84,24 @@ footer {
 
 .venue {
   width: 275px;
+  height: 360px;
   padding: 20px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+  background-color: Lavender;
 }
 
 .venueimage {
+  display: block;
+  margin: auto;
   margin-top: 20px;
 }
 
 #venues h2 {
+  height: 50px;
   font-family: Work Sans;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.2;
   text-align: center;
   padding-top: 5px;
 }
@@ -127,7 +133,7 @@ footer {
 #venues {
   display: flex;
   justify-content: space-around;
-  min-height: 250px;
+  min-height: 350px;
 }
 
 #weather {
@@ -163,6 +169,13 @@ footer {
   letter-spacing: 0.5px;
   text-align: center;
   color: #ffffff;
+}
+/* My extra code */
+.venue *{
+  padding: 2px;
+  text-align: center;
+  display: block;
+  margin: auto;
 }
 
 @media (max-width: 860px) {
@@ -203,3 +216,5 @@ footer {
     text-align: center;
   }
 }
+
+/* My CSS */
